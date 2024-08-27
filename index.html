@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
     <title>MultiMarket</title>
+    <link rel="icon" href="arquivos/logo.png" type="image/icon">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -68,12 +74,19 @@
         <div class="payment-content">
             <span class="close-payment" onclick="togglePaymentModal()">&times;</span>
             <h2>Pagamento</h2>
+            
+            <div id="payment-summary">
+                <h3>Resumo da Compra</h3>
+                <div id="payment-cart-items">
+
+                </div>
+            </div>
+            
             <form id="payment-form">
                 <label for="full-name">Nome Completo:</label>
                 <input type="text" id="full-name" name="full-name" required>
                 <label for="zip-code">CEP:</label>
-                <input name="cep" type="text" id="cep" value="" size="10" maxlength="9"
-                onblur="pesquisacep(this.value);" required>
+                <input name="cep" type="text" id="cep" value="" size="10" maxlength="9" onblur="pesquisacep(this.value);" required>
                 <label for="street">Rua:</label>
                 <input type="text" id="rua" name="street" required>
                 <label for="number">Número:</label>
@@ -91,12 +104,15 @@
                     <option value="standard">Entrega Padrão</option>
                     <option value="express">Entrega Expressa</option>
                 </select>
-                <p id="shipping-cost">Custo do Frete: R$ 0,00</p>
+                <p id="shipping-cost">Custo do Frete: R$ 10,00</p>
                 <label for="payment-method">Método de Pagamento:</label>
                 <select id="payment-method" name="payment-method" required>
                     <option value="credit-card">Cartão de Crédito</option>
                     <option value="paypal">PayPal</option>
                 </select>
+                <div id="payment-summary">
+                    <p id="final-total">Total Final: R$ 0.00</p>
+                </div>
                 <button type="submit" class="payment-button">Finalizar Compra</button>
             </form>
         </div>

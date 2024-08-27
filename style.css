@@ -1,5 +1,5 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
@@ -45,7 +45,7 @@ h2 {
 header input[type="text"] {
     padding: 10px 20px;
     width: 300px;
-    margin: 0 30px 0 500px;
+    margin: 0 30px 0 370px;
     border: none;
     border-radius: 3px;
 }
@@ -284,7 +284,7 @@ button.add-to-cart:hover {
     background-color: #fff;
     border-radius: 5px;
     padding: 30px;
-    width: 300px;
+    width: 350px;
     max-height: 90%;
     overflow-y: auto;
     position: relative;
@@ -400,4 +400,34 @@ input, select {
 
 .payment-form input {
     background-color: #25c54a;
+}
+
+#payment-summary {
+    margin-bottom: 20px;
+}
+
+#payment-cart-items {
+    margin-bottom: 10px;
+}
+
+#payment-cart-items .cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#payment-cart-items .cart-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+#payment-cart-items .cart-item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#payment-total {
+    font-weight: bold;
+    margin-top: 10px;
 }

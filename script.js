@@ -5,13 +5,23 @@ const cartTotal = document.getElementById('cart-total');
 const cart = [];
 const MAX_QUANTITY = 10;
 let allProducts = [];
-const zipCode = document.getElementById('cep').value;
-const shippingMethod = document.getElementById('shipping-method').value;
+const zipCodeInput = document.getElementById('cep');
+const shippingMethodInput = document.getElementById('shipping-method');
+const loginModal = document.getElementById('login-modal');
+const paymentModal = document.getElementById('payment-modal');
+const shippingCostElement = document.getElementById('shipping-cost');
+const finalTotalElement = document.getElementById('final-total');
+const searchInput = document.getElementById('search');
+
+searchInput.addEventListener('input', function() {
+    filterByName(searchInput.value);
+});
 
 async function fetchProducts() {
     try {
         const response = await fetch('https://fakestoreapi.com/products');
         const products = await response.json();
+        allProducts = products; 
         displayProducts(products);
     } catch (error) {
         console.error('Erro ao buscar produtos:', error);
@@ -23,7 +33,7 @@ function displayProducts(products) {
     products.forEach(product => {
         const productElement = document.createElement('div');
         productElement.classList.add('product');
-        productElement.classList.add(product.category.replace(/ /g, '-')); 
+        productElement.classList.add(product.category.replace(/ /g, '-'));
 
         productElement.innerHTML = `
             <img src="${product.image}" alt="${product.title}" class="product-image">
@@ -109,21 +119,6 @@ function toggleCart() {
     }
 }
 
-function toggleLogin() {
-    if (cart.length > 0) {
-        if (loginModal.style.display === 'flex') {
-            loginModal.style.display = 'none';
-        } else {
-            loginModal.style.display = 'flex';
-        }
-    } else {
-        alert('Seu carrinho está vazio!');
-    }
-}
-
-const loginModal = document.getElementById('login-modal');
-const paymentModal = document.getElementById('payment-modal');
-
 function toggleLoginModal() {
     if (loginModal.style.display === 'flex') {
         loginModal.style.display = 'none';
@@ -136,16 +131,39 @@ function togglePaymentModal() {
     if (paymentModal.style.display === 'flex') {
         paymentModal.style.display = 'none';
     } else {
+        displayPaymentSummary();
         paymentModal.style.display = 'flex';
     }
 }
 
-function togglePayment() {
-    if (paymentModal.style.display === 'flex') {
-        paymentModal.style.display = 'none';
-    } else {
-        paymentModal.style.display = 'flex';
-    }
+function displayPaymentSummary() {
+    const paymentCartItemsContainer = document.getElementById('payment-cart-items');
+    const paymentTotal = document.getElementById('payment-total');
+
+    paymentCartItemsContainer.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const cartItem = document.createElement('div');
+        cartItem.classList.add('cart-item');
+        cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.title}">
+            <div class="cart-item-info">
+                <h3>${item.title}</h3>
+                <p>R$ ${item.price}</p>
+                <p>Quantidade: ${item.quantity}</p>
+            </div>
+        `;
+        paymentCartItemsContainer.appendChild(cartItem);
+        total += item.price * item.quantity;
+    });
+
+    const shippingMethod = shippingMethodInput.value;
+    const shippingCost = calculateShippingCost(shippingMethod);
+    const finalTotal = total + shippingCost;
+
+    shippingCostElement.textContent = `Custo do Frete: R$ ${shippingCost.toFixed(2)}`;
+    finalTotalElement.textContent = `Total Final: R$ ${finalTotal.toFixed(2)}`;
 }
 
 function toggleLogin() {
@@ -156,41 +174,53 @@ function toggleLogin() {
     }
 }
 
-document.getElementById('login-form').addEventListener('submit', function(event) {
-    event.preventDefault(); 
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    toggleLoginModal();
-    toggleCart();
-});
-
-function calculateShippingCost(zipCode, shippingMethod) {
+function calculateShippingCost(shippingMethod) {
     let cost = 0;
     if (shippingMethod === 'standard') {
-        cost = 10; 
+        cost = 10;
     } else if (shippingMethod === 'express') {
-        cost = 20; 
+        cost = 20;
     }
     return cost;
 }
 
-document.getElementById('payment-form').addEventListener('submit', function(event) {
-    event.preventDefault(); 
+function updateShippingAndTotal() {
+    const shippingMethod = shippingMethodInput.value;
+    const shippingCost = calculateShippingCost(shippingMethod);
+    const totalCost = parseFloat(cartTotal.textContent.replace('Total: R$ ', ''));
 
-    const shippingCost = calculateShippingCost(zipCode, shippingMethod);
+    shippingCostElement.textContent = `Custo do Frete: R$ ${shippingCost.toFixed(2)}`;
+    finalTotalElement.textContent = `Total Final: R$ ${(totalCost + shippingCost).toFixed(2)}`;
+}
 
-    document.getElementById('shipping-cost').textContent = `Custo do Frete: R$ ${shippingCost.toFixed(2)}`;
+document.getElementById('login-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-    alert('Compra finalizada com sucesso!');
-
-    togglePaymentModal();
     toggleLoginModal();
-    toggleCart();
+    togglePaymentModal(); 
 });
 
+document.getElementById('payment-form').addEventListener('submit', function(event) {
+    event.preventDefault();
 
+    const zipCode = zipCodeInput.value;
+    const shippingMethod = shippingMethodInput.value;
+    const shippingCost = calculateShippingCost(shippingMethod);
+    const totalCost = parseFloat(cartTotal.textContent.replace('Total: R$ ', ''));
 
+    shippingCostElement.textContent = `Custo do Frete: R$ ${shippingCost.toFixed(2)}`;
+    finalTotalElement.textContent = `Total Final: R$ ${(totalCost + shippingCost).toFixed(2)}`;
+
+    alert('Parabéns! Sua compra foi concluída com sucesso. Os dados de pagamento foram enviados para o seu e-mail, junto com o código de rastreamento.');
+
+    cart.length = 0; 
+    displayCartItems(); 
+
+    togglePaymentModal();
+    toggleCart();
+});
 
 function meu_callback(conteudo) {
     if (!conteudo.erro) {
@@ -233,5 +263,6 @@ function pesquisacep(valor) {
     }
 }
 
-
 fetchProducts();
+
+shippingMethodInput.addEventListener('change', updateShippingAndTotal);
